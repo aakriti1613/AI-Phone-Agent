@@ -28,7 +28,7 @@ def ai_response():
             model="llama3-70b-8192",
             messages=[{"role": "user", "content": query}],
             temperature=1,
-            max_tokens=50,
+            max_tokens=40,
             top_p=1,
             stop=None,
         )
@@ -62,32 +62,9 @@ def make_call():
 
 @app.route('/voice_response', methods=['GET', 'POST'])
 def voice_response():
-    message = request.args.get("message", "Hello! This is Sia, your virtual assistant.")
+    message = request.args.get("message", "Hello! This is your AI assistant.")
     response = VoiceResponse()
-
     response.say(message, voice="alice")
-
-    gather = response.gather(input='speech', timeout=10, action='/process_input')
-    gather.say("Please ask your question after the beep.")
-
-    return str(response)
-
-@app.route('/process_input', methods=['POST'])
-def process_input():
-    user_query = request.form.get('SpeechResult', '')
-
-    if not user_query:
-        response = VoiceResponse()
-        response.say("Sorry, I couldn't hear anything. Please try again.", voice="alice")
-        response.redirect('/voice_response')  
-        return str(response)
-
-    ai_response =ai_response(user_query)
-
-    response = VoiceResponse()
-    response.say(ai_response, voice="alice")
-    response.hangup()  
-
     return str(response)
 
 if __name__ == "__main__":
