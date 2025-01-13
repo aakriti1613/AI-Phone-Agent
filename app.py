@@ -13,7 +13,7 @@ TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")  
 twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
-groq_client = Groq(GROQ_API_KEY)
+groq_client = Groq(api_key=GROQ_API_KEY)
 
 @app.route('/ai_response', methods=['POST'])
 def ai_response():
