@@ -1,5 +1,3 @@
-# groq_client = Groq(api_key="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") college id api
-
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 from groq import Groq
@@ -8,14 +6,13 @@ from twilio.twiml.voice_response import VoiceResponse
 
 app = Flask(__name__)
 CORS(app)  
-
-TWILIO_ACCOUNT_SID = "AC47847977938f28f40eb6ae8c06eea688"
-TWILIO_AUTH_TOKEN = "aa197eac3527727899e70e95c5992043"
-TWILIO_PHONE_NUMBER = "+12318881481"  
-
+TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
+TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
+TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")  
 twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
-groq_client = Groq(api_key="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")
+groq_client = Groq(GROQ_API_KEY)
 
 @app.route('/ai_response', methods=['POST'])
 def ai_response():
