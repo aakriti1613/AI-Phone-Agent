@@ -319,14 +319,12 @@
                 updateMessage(`Sia: ${aiResponse}`, "ai");
 
             };
-
             recognition.onend = () => {
                 recognition.start();
             };
         } else {
             alert("Speech Recognition API is not supported in this browser.");
         }
-
 
         function updateMessage(content, sender) {
             chatMessages.innerHTML = "";
@@ -339,7 +337,7 @@
         async function getAIResponse(userText) {
             console.log("Fetching AI response for:", userText);
             try {
-                const response = await fetch('http://ai-phoneagent.onrender.com/ai_response', {
+                const response = await fetch('http://ai-phoneagent.onrender.com/ai_responses', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ query: userText }),
@@ -366,10 +364,8 @@
             }
         }
 
-
         function endCall() {
             if (recognition) recognition.stop();
-
             clearInterval(callTimer);
             document.querySelector('.chat-page').classList.add('hidden');
             document.querySelector('.end-page').classList.remove('hidden');
