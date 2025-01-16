@@ -10,6 +10,10 @@ AI Phone Agent is an advanced virtual assistant application that integrates cutt
 - **Voice Recognition**: Captures and processes voice queries using the Web Speech API.
 - **Cross-Platform Compatibility**: Hosted on Render for public access.
 
+![Call Sia - Your Virtual Assistant - Google Chrome 1_16_2025 2_47_23 PM](https://github.com/user-attachments/assets/1206d540-7ebc-4df0-823c-9f178dd086b7)
+![Call Sia - Your Virtual Assistant - Google Chrome 1_16_2025 2_47_40 PM](https://github.com/user-attachments/assets/b07d3dbb-975d-4d08-a17e-b9032408b9ae)
+![Call Sia - Your Virtual Assistant - Google Chrome 1_16_2025 2_47_58 PM](https://github.com/user-attachments/assets/78031a30-1d44-4fdb-87fd-09b16fd1f31f)
+
 ## Prerequisites
 ### Backend Requirements
 - **Python 3.9 or later**
@@ -92,10 +96,12 @@ AI Phone Agent is an advanced virtual assistant application that integrates cutt
 
 ### Backend Deployment
 1. Deploy the backend to Render or any cloud platform.
+   Link : https://ai-phoneagent.onrender.com
 2. Ensure the environment variables are set in the deployment configuration.
 
 ### Frontend Deployment
 1. Host the `index.html` file and assets on platforms like Netlify or Vercel.
+   Link : https://aiphoneagent.netlify.app
 2. Update the backend API endpoint in the JavaScript code to point to the deployed backend.
 
 ## API Endpoints
