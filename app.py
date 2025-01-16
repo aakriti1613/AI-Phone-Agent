@@ -53,7 +53,7 @@ def make_call():
         call = twilio_client.calls.create(
             to=to_phone,
             from_=TWILIO_PHONE_NUMBER,
-            url=f"https://aiphoneagent.netlify.app/voice_response?message={encoded_message}"  
+            url=f"https://ai-phoneagent.onrender.com/voice_response?message={encoded_message}"  
         )
         return jsonify({"status": "Call initiated", "call_sid": call.sid}), 200
     except Exception as e:
