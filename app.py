@@ -22,7 +22,6 @@ def ai_responses():
     query = data.get("query", "")
     if not query:
         return jsonify({"response": "Please provide a query."}), 400
-
     try:
         completion = groq_client.chat.completions.create(
             model="llama3-70b-8192",
@@ -63,24 +62,46 @@ def make_call():
 def voice_response():
     message = request.args.get("message", "Hello! This is Sia, your virtual assistant.")
     response = VoiceResponse()
-    response.say(message, voice="alice")
-    gather = response.gather(input='speech', timeout=10, action='/process_input')
-    gather.say("Please ask your question after the beep.")
+    response.say(message, voice="aditi")
+    response.gather(
+        num_digits=1,  
+        action='/process_input',
+        timeout=10  
+    )
+    response.say("No input received. The call will now end.")
+    response.hangup()
     return str(response)
 
 @app.route('/process_input', methods=['POST'])
 def process_input():
-    user_query = request.form.get('SpeechResult', '')
-    if not user_query:
-        response = VoiceResponse()
-        response.say("Sorry, I couldn't hear anything. Please try again.", voice="alice")
-        response.redirect('/voice_response') 
-        return str(response)
-
-    ai_response =ai_responses(user_query)
+    pressed_key = request.form.get('Digits')
     response = VoiceResponse()
-    response.say(ai_response, voice="alice")
-    response.hangup()  
+    if pressed_key:
+        response.say("Thank you! You pressed a key. Now let's continue the call.", voice="alice")
+        response.say("Please ask your question after the beep.")
+        response.record(timeout=10, transcribe=True, action='/process_query')
+    else:
+        response.say("No input detected. The call will now end.", voice="aditi")
+        response.hangup()
+    return str(response)
+
+@app.route('/process_query', methods=['POST'])
+def process_query():
+    recording_url = request.form.get('RecordingUrl')
+    transcription = request.form.get('TranscriptionText') 
+    response = VoiceResponse()
+    if recording_url:
+        print(f"Recording URL: {recording_url}")
+        if transcription:
+            print(f"Transcription: {transcription}")
+            ai_response = ai_responses(transcription)
+            response.say(ai_response, voice="aditi")
+        else:
+            response.say("Thank you for your input. We are processing your query.", voice="alice")
+        response.hangup()
+    else:
+        response.say("Sorry, we could not capture your input. Please try again later.", voice="alice")
+        response.hangup()
     return str(response)
 
 if __name__ == "__main__":
