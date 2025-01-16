@@ -58,6 +58,21 @@ def make_call():
         print(f"Error making call: {e}")
         return jsonify({"error": str(e)}), 500
 
+def generate_ai_response(query):
+    try:
+        completion = groq_client.chat.completions.create(
+            model="llama3-70b-8192",
+            messages=[{"role": "user", "content": query}],
+            temperature=1,
+            max_tokens=50,
+            top_p=1,
+            stop=None,
+        )
+        return completion.choices[0].message.content.strip()
+    except Exception as e:
+        print(f"Error generating AI response: {e}")
+        return "Sorry, I couldn't process your request."
+
 @app.route('/voice_response', methods=['GET', 'POST'])
 def voice_response():
     message = request.args.get("message", "Hello! This is Sia, your virtual assistant.")
@@ -74,14 +89,19 @@ def voice_response():
 
 @app.route('/process_input', methods=['POST'])
 def process_input():
-    pressed_key = request.form.get('Digits')
+    pressed_key = request.form.get('Digits')  
+    speech_input = request.form.get('SpeechResult')
     response = VoiceResponse()
     if pressed_key:
-        response.say("Thank you! You pressed a key. Now let's continue the call.", voice="alice")
+        response.say(f"Thank you! You pressed {pressed_key}.", voice="alice")
         response.say("Please ask your question after the beep.")
         response.record(timeout=10, transcribe=True, action='/process_query')
+    elif speech_input:
+        print(f"User spoke: {speech_input}")  
+        ai_response = generate_ai_response(speech_input) 
+        response.say(ai_response, voice="aditi")
     else:
-        response.say("No input detected. The call will now end.", voice="aditi")
+        response.say("No input detected. The call will now end.", voice="alice")
         response.hangup()
     return str(response)
 
@@ -107,14 +127,14 @@ def process_query():
                 response.say(ai_response, voice="aditi")
             except Exception as e:
                 print(f"Error generating AI response: {e}")
-                response.say("Sorry, I couldn't process your input. Please try again later.", voice="alice")
+                response.say("Sorry, I couldn't process your input. Please try again later.", voice="aditi")
         else:
-            response.say("Thank you for your input. We are processing your query.", voice="alice")
+            response.say("Thank you for your input. We are processing your query.", voice="aditi")
         response.hangup()
     else:
-        response.say("Sorry, we could not capture your input. Please try again later.", voice="alice")
+        response.say("Sorry, we could not capture your input. Please try again later.", voice="aditi")
         response.hangup()
-
+        
     return str(response)
 
 if __name__ == "__main__":
