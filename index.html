@@ -337,7 +337,7 @@
         async function getAIResponse(userText) {
             console.log("Fetching AI response for:", userText);
             try {
-                const response = await fetch('http://ai-phoneagent.onrender.com/ai_responses', {
+                const response = await fetch('https://ai-phoneagent.onrender.com/ai_responses', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ query: userText }),
