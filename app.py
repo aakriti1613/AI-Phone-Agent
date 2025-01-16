@@ -94,14 +94,27 @@ def process_query():
         print(f"Recording URL: {recording_url}")
         if transcription:
             print(f"Transcription: {transcription}")
-            ai_response = ai_responses(transcription)
-            response.say(ai_response, voice="aditi")
+            try:
+                completion = groq_client.chat.completions.create(
+                    model="llama3-70b-8192",
+                    messages=[{"role": "user", "content": transcription}],
+                    temperature=1,
+                    max_tokens=40,
+                    top_p=1,
+                    stop=None,
+                )
+                ai_response = completion.choices[0].message.content.strip()
+                response.say(ai_response, voice="aditi")
+            except Exception as e:
+                print(f"Error generating AI response: {e}")
+                response.say("Sorry, I couldn't process your input. Please try again later.", voice="alice")
         else:
             response.say("Thank you for your input. We are processing your query.", voice="alice")
         response.hangup()
     else:
         response.say("Sorry, we could not capture your input. Please try again later.", voice="alice")
         response.hangup()
+
     return str(response)
 
 if __name__ == "__main__":
