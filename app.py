@@ -45,11 +45,11 @@ def make_call():
     to_phone = data.get("to_phone")
     message = data.get("message", "Hello! This is Sia, your virtual assistant.")
 
-    if not to_phone or not initial_message:
+    if not to_phone or not message:
         return jsonify({"error": "Phone number and message are required"}), 400
 
     try:
-        encoded_message = urllib.parse.quote(initial_message)
+        encoded_message = urllib.parse.quote(message)
         call = twilio_client.calls.create(
             to=to_phone,
             from_=TWILIO_PHONE_NUMBER,
