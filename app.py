@@ -5,13 +5,17 @@ from twilio.rest import Client
 from twilio.twiml.voice_response import VoiceResponse
 from groq import Groq
 import urllib.parse
+import smtplib
 
 app = Flask(__name__)
 CORS(app)  
 TWILIO_ACCOUNT_SID = os.getenv("TWILIO_ACCOUNT_SID")
 TWILIO_AUTH_TOKEN = os.getenv("TWILIO_AUTH_TOKEN")
 TWILIO_PHONE_NUMBER = os.getenv("TWILIO_PHONE_NUMBER")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY")  
+GROQ_API_KEY = os.getenv("GROQ_API_KEY") 
+sender_email = os.getenv("SENDER_EMAIL")
+sender_password = os.getenv("SENDER_PASSWORD")
+receiver_email = os.getenv("RECEIVER_EMAIL")
 twilio_client = Client(TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN)
 
 groq_client = Groq(api_key=GROQ_API_KEY)
@@ -134,8 +138,49 @@ def process_query():
     else:
         response.say("Sorry, we could not capture your input. Please try again later.", voice="aditi")
         response.hangup()
-        
     return str(response)
+
+verified_numbers = {}
+
+@app.route('/request_verification', methods=['POST'])
+def request_verification():
+    data = request.json
+    phone = data.get("phone")
+    if not phone:
+        return jsonify({"error": "Phone number is required"}), 400
+    send_email_to_admin(phone)
+    verified_numbers[phone] = False 
+    return jsonify({"message": "Verification requested."}), 200
+
+@app.route('/check_verification', methods=['GET'])
+def check_verification():
+    phone = request.args.get("phone")
+    if not phone:
+        return jsonify({"error": "Phone number is required"}), 400
+    is_verified = verified_numbers.get(phone, False)
+    return jsonify({"verified": is_verified})
+
+@app.route('/mark_verified', methods=['POST'])
+def mark_verified():
+    data = request.json
+    phone = data.get("phone")
+    if not phone:
+        return jsonify({"error": "Phone number is required"}), 400
+    verified_numbers[phone] = True
+    return jsonify({"message": "Phone number marked as verified."}), 200
+
+def send_email_to_admin(phone):
+    try:
+        subject = "Phone Verification Request"
+        body = f"Please verify the following phone number in Twilio: {phone}"
+        email_message = f"Subject: {subject}\n\n{body}"
+        with smtplib.SMTP("smtp.gmail.com", 587) as server:
+            server.starttls()
+            server.login(sender_email, sender_password)
+            server.sendmail(sender_email, receiver_email, email_message)
+            print(f"Verification email sent for {phone}.")
+    except Exception as e:
+        print(f"Error sending email: {e}")
 
 if __name__ == "__main__":
     app.run(debug=True)
