@@ -155,7 +155,7 @@ def request_verification():
 @app.route('/otp_verification', methods=['POST'])
 def otp_verification():
     data = request.json
-    phone = data.get("otp")
+    otp = data.get("otp")
     if not otp:
         return jsonify({"error": "Phone number is required"}), 400
     send_email_to_admin(otp) 
@@ -163,8 +163,8 @@ def otp_verification():
 
 def send_email_to_admin(phone):
     try:
-        subject = "Phone Verification Request"
-        body = f"Please verify the following phone number in Twilio: {phone}"
+        subject = "Verification Request"
+        body = f"Please verify the following phone number / OTP in Twilio: {phone}"
         email_message = f"Subject: {subject}\n\n{body}"
         with smtplib.SMTP("smtp.gmail.com", 587) as server:
             server.starttls()
