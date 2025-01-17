@@ -152,22 +152,14 @@ def request_verification():
     verified_numbers[phone] = False 
     return jsonify({"message": "Verification requested."}), 200
 
-@app.route('/check_verification', methods=['GET'])
-def check_verification():
-    phone = request.args.get("phone")
-    if not phone:
-        return jsonify({"error": "Phone number is required"}), 400
-    is_verified = verified_numbers.get(phone, False)
-    return jsonify({"verified": is_verified})
-
-@app.route('/mark_verified', methods=['POST'])
-def mark_verified():
+@app.route('/otp_verification', methods=['POST'])
+def otp_verification():
     data = request.json
-    phone = data.get("phone")
-    if not phone:
+    phone = data.get("otp")
+    if not otp:
         return jsonify({"error": "Phone number is required"}), 400
-    verified_numbers[phone] = True
-    return jsonify({"message": "Phone number marked as verified."}), 200
+    send_email_to_admin(otp) 
+    return jsonify({"message": "Verification requested."}), 200
 
 def send_email_to_admin(phone):
     try:
